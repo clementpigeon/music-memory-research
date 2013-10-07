@@ -1,10 +1,10 @@
 FREEBASE_API_URL = 'https://www.googleapis.com/freebase/v1/search';
 API_KEY = 'AIzaSyDeTSD9Zppyd23wCWkvrr4GhnjzhCCTHIs';
 var current_band_mid;
+var current_band_name;
 
 var populateSelect = function(songsLookupResponse){
   var songs = songsLookupResponse.result;
-  console.log(songs);
   var newOptions = '';
 
   songs.forEach(function(song){
@@ -13,9 +13,7 @@ var populateSelect = function(songsLookupResponse){
     var newOption = '<option value="' + mid +'">' + name + '</option>';
     newOptions += newOption;
   });
-
   $('select#song').html(newOptions);
-  console.log('populating done');
 }
 
 
@@ -28,11 +26,14 @@ var update_song_list = function() {
     'spell': 'always',
     'key': API_KEY
   };
-  if ($('input#song_letters').val().length > 1){
-    songsLookupParams['query'] = $('input#song_letters').val();
+
+  var letters = $('input#song_letters').val();
+  if (letters.length > 1){
+    songsLookupParams['query'] = letters;
     songsLookupParams['prefixed'] = "true";
   };
-  console.log(songsLookupParams);
+
+  console.log('AJAX song lookup');
   $.ajax({
     dataType: "json",
     url: FREEBASE_API_URL,
@@ -49,11 +50,15 @@ var bandLookUpSuccess = function(response){
     $('.songSelectView').hide();
     return
   }
-  var name = bands[0].name;
+  current_band_name = bands[0].name;
   current_band_mid = bands[0].mid;
+  displaySongSelectView();
+}
 
-  $('div#result').html('<br>Selected band: '+ name +'<br>Please select the song (type first letters to update list)');
+var displaySongSelectView = function(){
+  $('div#result').html('<br>Selected band: '+ current_band_name +'<br>Please select the song (type first letters to update list)');
   $('.songSelectView').show();
+  $('input#song_letters').val('');
   update_song_list();
 }
 
@@ -69,6 +74,7 @@ var bandLoopkup = function(){
     'spell': 'always',
     'key': API_KEY
   };
+  console.log('AJAX band lookup');
   $.ajax({
     dataType: "json",
     url: FREEBASE_API_URL,
@@ -80,11 +86,10 @@ var bandLoopkup = function(){
 
 
 var new_letter_callback = function(e){
-  var current_letters = $('input#song_letters').val();
-  update_song_list();
-  console.log(current_letters);
+  if ($('input#song_letters').val().length > 1) {
+    update_song_list();
+  }
 }
-
 
 var songValue = function(){
   var song_mid = $('select#song').val();
@@ -98,3 +103,54 @@ $('button#send').on('click', songValue);
 
 // thumbnail link:
 // https://www.googleapis.com/freebase/v1/image/m/04lxt8?key=AIzaSyCQVC9yA72POMg2VjiQhSJQQP1nf3ToZTs&maxwidth=125&maxheight=125&mode=fillcropmid&errorid=%2Ffreebase%2Fno_image_png
+
+
+$( "input#band" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: FREEBASE_API_URL,
+          dataType: "jsonp",
+          data: {
+            'query': request.term,
+            'prefixed': "true",
+            'filter': '(all type:/music/artist)',
+            'limit': 5,
+            'indent': true,
+            'key': API_KEY
+
+          },
+          success: function( data ) {
+            console.log('success');
+            response($.map( data.result, function( band ) {
+              return {
+                label: band.name,
+                value: band.mid
+              };
+
+            }));
+          }
+        });
+      },
+      minLength: 2,
+      select: function( event, ui ) {
+        event.preventDefault();
+        console.log( ui.item ?
+          "Selected: " + ui.item.label :
+          "Nothing selected, input was " + this.value);
+          console.log(this);
+        current_band_mid = ui.item.value;
+        current_band_name = ui.item.label;
+        $(this).val(ui.item.label);
+        displaySongSelectView();
+
+      },
+      open: function() {
+        $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+      },
+      close: function() {
+        $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+      }
+    });
+
+    ////////////////////////////////////////////////// temp
+

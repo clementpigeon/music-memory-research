@@ -2,33 +2,38 @@
 <html>
 <head>
   <title>Testing the Freebase API</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
-
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <style>
     .songSelectView {
       display: none;
     }
     select#song {
       width: 300px;
+      -webkit-appearance: menulist-button;
     }
     </style>
+
 </head>
 
 <body>
   <div>Enter the name of the band.</div>
-  <input id='band'>
-  <button id='search'>Select band</button><br>
-  <div id='result'></div>
 
-  <div class='songSelectView'>
-    <input id='song_letters'>
-    <select id="song" name="song" >
-      <option selected="selected"></option>
-    </select>
-    <button id='send'>Select song</button><br>
-    <div id='newSong'></div>
+  <div class="ui-widget">
+    <input id='band'>
+    <div id='result'></div>
+    <div class='songSelectView'>
+      <input id='song_letters'>
+      <select id="song" name="song" >
+        <option selected="selected"></option>
+      </select>
+      <button id='send'>Select song</button><br><br>
+      <div id='newSong'></div>
+    </div>
   </div>
 
-  <script src="freebase-input.js"></script>
+  <script src="freebase-lookup.js"></script>
+
 </body>
 </html>
