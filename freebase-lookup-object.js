@@ -8,39 +8,6 @@ var View = {
   song_mid: null,
   song_name: null,
 
-  bandLoopkup: function(){
-    var query = $('#band').val();
-    var bandLookupParams = {
-      'query': query,
-      'filter': '(all type:/music/artist)',
-      'limit': 1,
-      'indent': true,
-      'spell': 'always',
-      'key': this.API_KEY
-    };
-    $.ajax({
-      dataType: "json",
-      url: this.FREEBASE_API_URL,
-      data: bandLookupParams,
-      success: this.bandLookUpSuccess,
-      error: function(){
-        console.log("couldn't connect to Frebase API");
-      }
-    });
-  },
-
-  bandLookUpSuccess : function(response){
-    var bands = response.result;
-    if (bands.length < 1){
-      $('div#result').html("Can't find that band. Please enter another name.");
-      $('.songSelectView').hide();
-      return
-    }
-    this.current_band_name = bands[0].name;
-    this.current_band_mid = bands[0].mid;
-    this.displaySongSelectView();
-  },
-
   displaySongSelectView: function(){
     $('div#result').html('<br>Select amongst most popular songs, or type first letters to update the list.');
     $('.songSelectView').show();
@@ -107,10 +74,9 @@ var View = {
 
   initialize: function(){
     this.setupAutoComplete();
-    $('button#search').on('click', this.bandLoopkup.bind(this));
     $('input#song_letters').on('keyup', this.new_letter_callback.bind(this));
-    $('button#send').on('click', this.songValue.bind(this));
-    $('button#send').on('click', this.displayValues.bind(this));
+    $('button#songSelected').on('click', this.songValue.bind(this));
+    $('button#songSelected').on('click', this.displayValues.bind(this));
   },
 
   setupAutoComplete: function(){
