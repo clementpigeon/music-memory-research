@@ -61,8 +61,8 @@ var View = {
   },
 
   songValue: function(){
-    View.song_mid = $('select#song').val();
-    View.song_title = $('select#song').find("option[value='" + $("select#song").val() + "']").text();
+    this.song_mid = $('select#song').val();
+    this.song_title = $('select#song').find("option[value='" + $("select#song").val() + "']").text();
   },
 
   displayValues: function(){
